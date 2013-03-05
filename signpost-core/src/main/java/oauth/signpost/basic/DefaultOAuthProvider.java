@@ -28,6 +28,7 @@ import oauth.signpost.http.HttpResponse;
 public class DefaultOAuthProvider extends AbstractOAuthProvider {
 
     private static final long serialVersionUID = 1L;
+    private String requestMethod = "GET";
 
     public DefaultOAuthProvider(String requestTokenEndpointUrl, String accessTokenEndpointUrl,
             String authorizationWebsiteUrl) {
@@ -37,7 +38,7 @@ public class DefaultOAuthProvider extends AbstractOAuthProvider {
     protected HttpRequest createRequest(String endpointUrl) throws MalformedURLException,
             IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(endpointUrl).openConnection();
-        connection.setRequestMethod("POST");
+        connection.setRequestMethod(this.requestMethod);
         connection.setAllowUserInteraction(false);
         connection.setRequestProperty("Content-Length", "0");
         return new HttpURLConnectionRequestAdapter(connection);
@@ -47,6 +48,19 @@ public class DefaultOAuthProvider extends AbstractOAuthProvider {
         HttpURLConnection connection = (HttpURLConnection) request.unwrap();
         connection.connect();
         return new HttpURLConnectionResponseAdapter(connection);
+    }
+
+    /**
+     * Set the request method used.
+     * By default, this class with use the "GET" method. If you require a different method, set it here.
+     * If the requestMethod is null or empty, it will be ignored.
+     *
+     * @param requestMethod the request method to use.
+     */
+    public void setRequestMethod(String requestMethod) {
+        if (requestMethod != null && !requestMethod.trim().isEmpty()) {
+            this.requestMethod = requestMethod.trim();
+        }
     }
 
     @Override
